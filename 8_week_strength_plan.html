@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-Week Strength Plan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f7f4; color: #1a1a1a; font-size: 14px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 2rem; }
+
+  .phase-nav { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .phase-btn { padding: 7px 16px; font-size: 13px; font-weight: 500; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #555; cursor: pointer; transition: all 0.15s; }
+  .phase-btn:hover { border-color: #aaa; color: #222; }
+  .phase-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  .week-nav { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+  .week-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #666; cursor: pointer; transition: all 0.15s; }
+  .week-btn.active { background: #444; color: #fff; border-color: #444; }
+
+  .phase-info { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 18px; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 20px; }
+  .info-item { font-size: 12px; }
+  .info-label { color: #999; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; margin-bottom: 2px; }
+  .info-val { font-weight: 600; font-size: 13px; color: #1a1a1a; }
+
+  .tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+  .day-block { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; }
+  .day-head { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+  .day-title { font-size: 14px; font-weight: 600; }
+  .day-sub { font-size: 11px; color: #999; margin-top: 1px; }
+  .badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-lower { background: #fff4e0; color: #a06000; }
+  .badge-upper { background: #e6f0ff; color: #1a5fac; }
+  .badge-core  { background: #e6f7ef; color: #1a7a4a; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #fafafa; }
+  thead th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; padding: 7px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+  thead th:last-child { text-align: right; }
+
+  tbody tr { border-bottom: 1px solid #f5f5f5; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+
+  td { padding: 7px 14px; font-size: 12px; color: #333; vertical-align: middle; }
+  td:last-child { text-align: right; font-size: 11px; color: #888; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .section-row td { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #bbb; padding: 10px 14px 4px; background: #fafafa; }
+
+  .ex-name { font-weight: 500; color: #1a1a1a; }
+  .ex-note { font-size: 11px; color: #aaa; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>8-Week Strength Plan</h1>
+  <p class="subtitle">5 days/week · Mon Lower · Tue Upper · Wed Lower · Thu Upper · Fri Core</p>
+
+  <div class="phase-nav" id="phaseNav"></div>
+  <div class="week-nav" id="weekNav"></div>
+
+  <div class="phase-info" id="phaseInfo"></div>
+  <div class="tables-grid" id="tablesGrid"></div>
+</div>
+
+<script>
+const phases = [
+  { id:"base",    label:"Base",    weeks:"Weeks 1–2", reps:"8–10", pct:"65–75%", rpe:"RPE 6–7", rest:"90–120s / 60–90s", wkLabels:["Week 1","Week 2"],
+    s:{ cpd:"4×8-10", acc:"3×10-12", core:"3×12-15", plank:"3×20-30s" } },
+  { id:"gain",    label:"Gain",    weeks:"Weeks 3–4", reps:"6–8",  pct:"75–82%", rpe:"RPE 7–8", rest:"2–3min / 90s",    wkLabels:["Week 3","Week 4"],
+    s:{ cpd:"4×6-8",  acc:"3×8-10",  core:"3×10-12", plank:"3×25-35s" } },
+  { id:"perform", label:"Perform", weeks:"Weeks 5–6", reps:"3–4",  pct:"85–92%", rpe:"RPE 8–9", rest:"3–4min / 2min",   wkLabels:["Week 5","Week 6"],
+    s:{ cpd:"4×3-4",  acc:"3×6-8",   core:"3×8-10",  plank:"3×30-40s" } },
+  { id:"deload",  label:"Deload",  weeks:"Weeks 7–8", reps:"5–6",  pct:"~60%",   rpe:"RPE 4–5", rest:"As needed",        wkLabels:["Week 7","Week 8"],
+    s:{ cpd:"3×5-6",  acc:"2×10-12", core:"2×12",    plank:"2×20s" } }
+];
+
+function sessions(p) {
+  const s = p.s;
+  return [
+    { day:"Monday",   label:"Mon", type:"lower", badge:"Lower body", sections:[
+        { title:"Compounds", rows:[
+          ["Barbell back squat",  s.cpd+" @ "+p.pct],
+          ["Barbell deadlift",    s.cpd+" @ "+p.pct]
+        ]},
+        { title:"Accessories", rows:[
+          ["Barbell RDL",              s.acc],
+          ["DB Bulgarian split squat", s.acc],
+          ["Goblet squat",             s.acc],
+          ["Peterson step down",       s.acc],
+          ["Copenhagen plank",         s.plank],
+          ["Seated soleus calf raise", s.acc],
+          ["Standing calf raise",      s.acc]
+        ]}
+    ]},
+    { day:"Tuesday",  label:"Tue", type:"upper", badge:"Upper body", sections:[
+        { title:"Compounds", rows:[
+          ["Barbell incline chest press", s.cpd+" @ "+p.pct],
+          ["Weighted pull-ups",           s.cpd],
+          ["Weighted dips",               s.cpd]
+        ]},
+        { title:"Pulling", rows:[
+          ["Pendlay row",       s.acc],
+          ["Single arm DB row", s.acc]
+        ]},
+        { title:"Accessories + Arms", rows:[
+          ["DB flat chest press",   s.acc],
+          ["Arnold press",          s.acc],
+          ["Tricep pushdown",       s.acc],
+          ["Barbell preacher curl", s.acc],
+          ["DB hammer curl",        s.acc]
+        ]}
+    ]},
+    { day:"Wednesday",label:"Wed", type:"lower", badge:"Lower body", sections:[
+        { title:"Compounds", rows:[
+          ["Barbell front squat",    s.cpd+" @ "+p.pct],
+          ["Hip thrust (barbell)",   s.cpd+" @ "+p.pct]
+        ]},
+        { title:"Accessories", rows:[
+          ["Single leg DB RDL",        s.acc],
+          ["DB Bulgarian split squat", s.acc],
+          ["Peterson step down",       s.acc],
+          ["Goblet squat",             s.acc],
+          ["Copenhagen plank",         s.plank],
+          ["Standing calf raise",      s.acc],
+          ["Seated soleus calf raise", s.acc]
+        ]}
+    ]},
+    { day:"Thursday", label:"Thu", type:"upper", badge:"Upper body", sections:[
+        { title:"Compounds", rows:[
+          ["Barbell flat chest press", s.cpd+" @ "+p.pct],
+          ["Strict overhead press",    s.cpd+" @ "+p.pct],
+          ["Weighted pull-ups",        s.cpd]
+        ]},
+        { title:"Pulling", rows:[
+          ["T-bar row",    s.acc],
+          ["Gorilla row",  s.acc],
+          ["Single arm DB row", s.acc]
+        ]},
+        { title:"Accessories + Arms", rows:[
+          ["DB incline chest press", s.acc],
+          ["Skullcrushers",          s.acc],
+          ["DB bicep curl",          s.acc],
+          ["DB hammer curl",         s.acc]
+        ]}
+    ]},
+    { day:"Friday",   label:"Fri", type:"core",  badge:"Core", sections:[
+        { title:"Kettlebell", rows:[
+          ["KB Turkish get-up",  s.core],
+          ["KB overhead march",  "3×20m"],
+          ["KB suitcase march",  "3×20m"],
+          ["KB windmill",        s.core],
+          ["KB russian twist",   s.core]
+        ]},
+        { title:"Bodyweight", rows:[
+          ["Dead bug",          s.core],
+          ["Hollow body hold",  s.plank],
+          ["Hanging knee raise",s.core],
+          ["Plank pull-through",s.core]
+        ]}
+    ]}
+  ];
+}
+
+let cp = 0, cw = 0;
+
+function renderPhaseInfo(p) {
+  document.getElementById("phaseInfo").innerHTML = `
+    <div class="info-item"><div class="info-label">Block</div><div class="info-val">${p.label} — ${p.weeks}</div></div>
+    <div class="info-item"><div class="info-label">Rep range</div><div class="info-val">${p.reps}</div></div>
+    <div class="info-item"><div class="info-label">Intensity</div><div class="info-val">${p.pct}</div></div>
+    <div class="info-item"><div class="info-label">RPE target</div><div class="info-val">${p.rpe}</div></div>
+    <div class="info-item"><div class="info-label">Rest (cpd / acc)</div><div class="info-val">${p.rest}</div></div>
+  `;
+}
+
+function renderGrid(p) {
+  const sess = sessions(p);
+  let html = "";
+  sess.forEach(s => {
+    const badgeClass = "badge-"+s.type;
+    html += `<div class="day-block">
+      <div class="day-head">
+        <div><div class="day-title">${s.day}</div><div class="day-sub">${s.badge}</div></div>
+        <span class="badge ${badgeClass}">${s.badge}</span>
+      </div>
+      <table>
+        <thead><tr><th>Exercise</th><th>Sets × Reps</th></tr></thead>
+        <tbody>`;
+    s.sections.forEach(sec => {
+      html += `<tr class="section-row"><td colspan="2">${sec.title}</td></tr>`;
+      sec.rows.forEach(([name, scheme]) => {
+        html += `<tr><td class="ex-name">${name}</td><td>${scheme}</td></tr>`;
+      });
+    });
+    html += `</tbody></table></div>`;
+  });
+  document.getElementById("tablesGrid").innerHTML = html;
+}
+
+function buildPhaseNav() {
+  const nav = document.getElementById("phaseNav");
+  phases.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "phase-btn" + (i===0?" active":"");
+    b.textContent = p.label+" ("+p.weeks+")";
+    b.onclick = () => {
+      cp = i; cw = 0;
+      document.querySelectorAll(".phase-btn").forEach((x,j)=>x.classList.toggle("active",j===i));
+      buildWeekNav();
+      renderPhaseInfo(phases[cp]);
+      renderGrid(phases[cp]);
+    };
+    nav.appendChild(b);
+  });
+}
+
+function buildWeekNav() {
+  const nav = document.getElementById("weekNav");
+  nav.innerHTML = "";
+  phases[cp].wkLabels.forEach((l,i) => {
+    const b = document.createElement("button");
+    b.className = "week-btn"+(i===cw?" active":"");
+    b.textContent = l;
+    b.onclick = () => {
+      cw = i;
+      document.querySelectorAll(".week-btn").forEach((x,j)=>x.classList.toggle("active",j===i));
+    };
+    nav.appendChild(b);
+  });
+}
+
+buildPhaseNav();
+buildWeekNav();
+renderPhaseInfo(phases[0]);
+renderGrid(phases[0]);
+</script>
+</body>
+</html>
